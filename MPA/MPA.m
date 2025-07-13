@@ -94,9 +94,64 @@ disp(['MPA iterations is ' num2str(Iter)]);
         
      %------------------ Detecting top predator ------------------        
  for i=1:size(Prey,1)  
+
+         % Selection (barnacle find the mating by using its penis to neighbor
+         % using similar with DE
+         k1 = randperm(PopSize);
+         k2 = randperm(PopSize);
+         
+         k1x= chromosomes(k1,:);
+         k2x= chromosomes(k2,:);
+         pl = Prey(i,:);
+	     % find the barnacles less than Adjusted PL
+         select =[k1' k2']; 
+         LessThanPLs = abs(select(:,1)-select(:,2));
+         OverThanPLs = find((LessThanPLs)>pl) ;% if more than Adjusted PL the barnacle will not mating
+         SamePLs = find((LessThanPLs)==0); % if 0 means self mating or spermcast
+         
+         Barnaclesoffspring=repmat(Chromosome(),PopSize,MachineNumber); % S_i = pop x var
+         Dad_Barnacles=zeros(size(chromosomes,1),dim);
+         Mom_Barnacles=zeros(size(chromosomes,1),dim);
+         
+         for kk=1:size(LessThanPLs,1) % 1 : PopSize  
+             for kkk=1:MachineNumber
+    
+			     p=randn(); %p eqn 11
+			     Dad_Barnacles = repmat(Chromosome(),1,MachineNumber);
+			     Mom_Barnacles = repmat(Chromosome(),1,MachineNumber);
+             
+                 Dad_Barnacles(kk,kkk).X=p*k1x(kk,kkk).X;
+                 Dad_Barnacles(kk,kkk).Y=p*k1x(kk,kkk).Y;
+                 Dad_Barnacles(kk,kkk).Orientation=p*k1x(kk,kkk).Orientation;
+                              
+                 Mom_Barnacles(kk,kkk).X=(1-p)*k2x(kk,kkk).X;           %q=1-p  eqn 12
+                 Mom_Barnacles(kk,kkk).Y=(1-p)*k2x(kk,kkk).Y;           %q=1-p  eqn 12
+                 Mom_Barnacles(kk,kkk).Orientation=(1-p)*k2x(kk,kkk).Orientation; %q=1-p  eqn 12
+			     % Generate new offspring 
+                 Barnaclesoffspring(kk,kkk).X=XYCal((Dad_Barnacles(kk,kkk).X+Mom_Barnacles(kk,kkk).X),LengthWorkshop);
+                 Barnaclesoffspring(kk,kkk).Y=XYCal((Dad_Barnacles(kk,kkk).Y+Mom_Barnacles(kk,kkk).Y),WidthWorkshop);
+                 Barnaclesoffspring(kk,kkk).Orientation=OrientationCal((Dad_Barnacles(kk,kkk).Orientation+Mom_Barnacles(kk,kkk).Orientation));
+             end
+         end
+        
+         if OverThanPLs~=0
+             for k=1:size(OverThanPLs,1)
+                 temp3 = repmat(Chromosome(),1,MachineNumber);
+                 temp3(k,:)=k2x(OverThanPLs(k),:);
+                 for Z=1:MachineNumber             
+                     temp3(k,Z).X=XYCal((rand()*temp3(k,Z).X),LengthWorkshop);
+                     temp3(k,Z).Y=XYCal((rand()*temp3(k,Z).Y),WidthWorkshop);
+                     temp3(k,Z).Orientation=OrientationCal(rand()*temp3(k,Z).Orientation);
+				     % Generate new offspring
+                     Barnaclesoffspring(OverThanPLs(k),:)=temp3(k,:);
+                 end
+             end
+         end
+        lastfitness = AllFitness(i);
         %Calculate Fitness
-        fitness(i) = Fitness(chromosomes(i,:),MachineNumber,LengthWorkshop,WidthWorkshop,M,L,W,Xio,Yio,Xoo,Yoo,Lo,Wo,Xo,Yo,LoC,WoC,XoC,YoC,f,C);                     
-     if fitness(i)<Top_predator_fit 
+        AllFitness(i)= Fitness(Barnaclesoffspring(i,:),MachineNumber,LengthWorkshop,WidthWorkshop,M,L,W,Xio,Yio,Xoo,Yoo,Lo,Wo,Xo,Yo,LoC,WoC,XoC,YoC,f,C);    
+        fprintf('SMA Fitness %f  \n',AllFitness(i));
+        if fitness(i)<Top_predator_fit 
        Top_predator_fit=fitness(i); 
        Top_predator_pos=Prey(i,:);
      end  
