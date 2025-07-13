@@ -8,7 +8,7 @@ addpath('SMA')
 
 run = 1; % 25
 Max_iteration = 2;
-PopSize =2;
+PopSize =10;
 filename = 'result';
 functionsNumber = 4;
 ShowBestAnswer = 3;
