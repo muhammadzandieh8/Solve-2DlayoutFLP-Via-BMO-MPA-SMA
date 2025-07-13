@@ -2,7 +2,12 @@ function temp = SMA(algorithmName,Max_iteration,chromosomes,PopSize, MachineNumb
 tic
 disp('SMA is now tackling your problem')
 addpath(genpath('..'))
-dim = size(ub,2);   %dimension size
+lb = [1];  
+ub = [6];  
+dim = size(ub,1);
+lb=ones(1,dim).*lb; % lower boundary 
+ub=ones(1,dim).*ub; % upper boundary
+%dimension size
 % initialize position
 %bestPositions=zeros(1,dim);
 Destination_fitness=inf;%change this to -inf for maximization problems
@@ -10,7 +15,8 @@ AllFitness = inf*ones(PopSize,1);%record the fitness of all slime mold
 weight = ones(PopSize,MachineNumber);%fitness weight of each slime mold
 Convergence_curve=zeros(1,Max_iteration);
 z=0.3; % parameter
-
+N = PopSize;
+X=initialization(N,dim,ub,lb);
 %disp('Initialize the set of random solutions...')
 %Initialize the set of random solutions
 
@@ -25,6 +31,9 @@ while  it <= Max_iteration
             chromosomes(i,:) = CreateCar(MachineNumber,LengthWorkshop,WidthWorkshop,L,W,LoC,WoC,XoC,YoC);  
         end
         AllFitness(i)= Fitness(chromosomes(i,:),MachineNumber,LengthWorkshop,WidthWorkshop,M,L,W,Xio,Yio,Xoo,Yoo,Lo,Wo,Xo,Yo,LoC,WoC,XoC,YoC,f,C);    
+        Flag4ub=X(i,:)>ub;
+        Flag4lb=X(i,:)<lb;
+        X(i,:)=(X(i,:).*(~(Flag4ub+Flag4lb)))+ub.*Flag4ub+lb.*Flag4lb;
     end    
     [SmellOrder,SmellIndex] = sort(AllFitness);  %Eq.(2.6
     worstFitness = SmellOrder(PopSize);
@@ -43,7 +52,7 @@ while  it <= Max_iteration
     
     %update the best fitness value and best position
     if bestFitness < Destination_fitness
-        bestPositions=chromosomes(SmellIndex(1),:);
+        bestPositions=X(SmellIndex(1),:);
         Destination_fitness = bestFitness;
     end
     
@@ -52,52 +61,36 @@ while  it <= Max_iteration
     % Update the Position of search agents
     for i=1:PopSize
         if rand<z     %Eq.(2.7)
-            chromosomes(i,:) = CreateCar(MachineNumber,LengthWorkshop,WidthWorkshop,L,W,LoC,WoC,XoC,YoC);
+            X(i,:) = (ub-lb)*rand+lb;
         else
             p =tanh(abs(AllFitness(i)-Destination_fitness));  %Eq.(2.2)
             vb = unifrnd(-a,a,1,MachineNumber);  %Eq.(2.3)
             vc = unifrnd(-b,b,1,MachineNumber);
-            for j=1:MachineNumber
+            for j=1:dim
                 r = rand();
-                A = randi([1,PopSize]);  % two positions randomly selected from population
-                B = randi([1,PopSize]);
-                if r<p    %Eq.(2.1)                                              
-                    chromosomes(i,j).X = XYCal((bestPositions(1,j).X +vb(j)*weight(i,j)*(chromosomes(A,j).X-chromosomes(B,j).X)),LengthWorkshop);                 
-                    chromosomes(i,j).Y = XYCal((bestPositions(1,j).Y +vb(j)*weight(i,j)*(chromosomes(A,j).Y-chromosomes(B,j).Y)),WidthWorkshop);
-                    %chromosomes(i,j).Orientation = OrientationCal(bestPositions(1,j).Orientation +(vb(3)*weight(i,1)*chromosomes(A,j).Orientation-chromosomes(B,j).Orientation));
-                    chromosomes(i,j).Orientation = OrientationCal(bestPositions(1,j).Orientation +(vb(j)*weight(i,j)*chromosomes(A,j).Orientation-chromosomes(B,j).Orientation));
+                A = randi([1,N]);  % two positions randomly selected from population
+                B = randi([1,N]);
+                if r<p    %Eq.(2.1)
+                    X(i,j) = bestPositions(j)+ vb(j)*(weight(i,j)*X(A,j)-X(B,j));
                 else
-                    %X(i,j) = vc(j)*X(i,j);
-                    chromosomes(i,j).X = XYCal((chromosomes(i,j).X*vc(j)),LengthWorkshop);
-                    chromosomes(i,j).Y = XYCal((chromosomes(i,j).Y*vc(j)),WidthWorkshop);
-                    chromosomes(i,j).Orientation = OrientationCal(chromosomes(i,j).Orientation*vc(j));
-
+                    X(i,j) = vc(j)*X(i,j);
                 end
             end
         end
     end
     Convergence_curve(it)=Destination_fitness;
     it=it+1;
-    for i=1:PopSize
-        Result = IsOverLapHappend(chromosomes(i,:),MachineNumber,LengthWorkshop,WidthWorkshop,L,W,LoC,WoC,XoC,YoC);
-        if Result == true
-            chromosomes(i,:) = CreateCar(MachineNumber,LengthWorkshop,WidthWorkshop,L,W,LoC,WoC,XoC,YoC);  
-        end
-        AllFitness(i)= Fitness(chromosomes(i,:),MachineNumber,LengthWorkshop,WidthWorkshop,M,L,W,Xio,Yio,Xoo,Yoo,Lo,Wo,Xo,Yo,LoC,WoC,XoC,YoC,f,C);    
-    end 
+
 end
-for i=1:PopSize
-    AllFitness(i)= Fitness(chromosomes(i,:),MachineNumber,LengthWorkshop,WidthWorkshop,M,L,W,Xio,Yio,Xoo,Yoo,Lo,Wo,Xo,Yo,LoC,WoC,XoC,YoC,f,C);    
-end  
 %%
 [val,idx] =sort(AllFitness);
-temp = repmat(Chromosome(),ShowBestAnswer,MachineNumber);
+ShowBestAnswer = 1;
+temp = ShowBestAnswer;
 for x=1:ShowBestAnswer
-    temp(x,:)= chromosomes(idx(x),:);
+    temp(x,:)= X(idx(x),:);
     tempval(x) = val(x);
 end
 elapsed_time=toc;
-DrawMap(algorithmName,LengthWorkshop,WidthWorkshop,temp,tempval,W,L,LoC,WoC,XoC,YoC);
 fprintf('SMA Finished %f Seconds. \n',elapsed_time);
 end
 

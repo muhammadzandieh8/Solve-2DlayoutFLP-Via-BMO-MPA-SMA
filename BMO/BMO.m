@@ -1,9 +1,9 @@
-function temp = BMO(algorithmName,Max_iteration,chromosomes,PopSize, MachineNumber,LengthWorkshop,WidthWorkshop,ub,M,L,W,Xio,Yio,Xoo,Yoo,Lo,Wo,Xo,Yo,ylower,yupper,xlower,xupper,f,C,ShowBestAnswer,LoC,WoC,XoC,YoC)
+function temp = BMO(algorithmName,Max_iteration,chromosomes,PopSize, MachineNumber,LengthWorkshop,WidthWorkshop,ub,M,L,W,Xio,Yio,Xoo,Yoo,Lo,Wo,Xo,Yo,ylower,yupper,xlower,xupper,f,C,ShowBestAnswer,LoC,WoC,XoC,YoC,optimizedPL)
 tic
 disp('BMO is now tackling your problem')
 dimension = 3;
 dim=dimension;
-pl=4;
+pl=optimizedPL;
 addpath(genpath('..'))
 lb = ones(1,dim);
 tic
