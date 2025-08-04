@@ -72,7 +72,8 @@ while  it <= Max_iteration
                  Barnaclesoffspring(kk,kkk).Orientation=OrientationCal((Dad_Barnacles(kk,kkk).Orientation+Mom_Barnacles(kk,kkk).Orientation));
              end
          end
-        
+         chromosomes(i,:) = Barnaclesoffspring(i,:);
+
          if OverThanPLs~=0
              for k=1:size(OverThanPLs,1)
                  temp3 = repmat(Chromosome(),1,MachineNumber);
@@ -83,6 +84,7 @@ while  it <= Max_iteration
                      temp3(k,Z).Orientation=OrientationCal(rand()*temp3(k,Z).Orientation);
 				     % Generate new offspring
                      Barnaclesoffspring(OverThanPLs(k),:)=temp3(k,:);
+                     chromosomes(k,:) = Barnaclesoffspring(OverThanPLs(k),:);
                  end
              end
          end
