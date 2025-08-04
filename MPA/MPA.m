@@ -131,8 +131,11 @@ disp(['MPA iterations is ' num2str(Iter)]);
                  Barnaclesoffspring(kk,kkk).X=XYCal((Dad_Barnacles(kk,kkk).X+Mom_Barnacles(kk,kkk).X),LengthWorkshop);
                  Barnaclesoffspring(kk,kkk).Y=XYCal((Dad_Barnacles(kk,kkk).Y+Mom_Barnacles(kk,kkk).Y),WidthWorkshop);
                  Barnaclesoffspring(kk,kkk).Orientation=OrientationCal((Dad_Barnacles(kk,kkk).Orientation+Mom_Barnacles(kk,kkk).Orientation));
+                
              end
          end
+         chromosomes(i,:) = Barnaclesoffspring(i,:);
+
         
          if OverThanPLs~=0
              for k=1:size(OverThanPLs,1)
@@ -144,6 +147,7 @@ disp(['MPA iterations is ' num2str(Iter)]);
                      temp3(k,Z).Orientation=OrientationCal(rand()*temp3(k,Z).Orientation);
 				     % Generate new offspring
                      Barnaclesoffspring(OverThanPLs(k),:)=temp3(k,:);
+                     chromosomes(k,:) = Barnaclesoffspring(OverThanPLs(k),:);
                  end
              end
          end
@@ -151,7 +155,7 @@ disp(['MPA iterations is ' num2str(Iter)]);
         %Calculate Fitness
         AllFitness(i)= Fitness(Barnaclesoffspring(i,:),MachineNumber,LengthWorkshop,WidthWorkshop,M,L,W,Xio,Yio,Xoo,Yoo,Lo,Wo,Xo,Yo,LoC,WoC,XoC,YoC,f,C);    
         fprintf('SMA Fitness %f  \n',AllFitness(i));
-        if fitness(i)<Top_predator_fit 
+      if fitness(i)<Top_predator_fit 
        Top_predator_fit=fitness(i); 
        Top_predator_pos=Prey(i,:);
      end  
