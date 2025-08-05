@@ -7,8 +7,8 @@ addpath('BMO')
 addpath('MPA')
 
 run = 1; % 25
-Max_iteration = 6;
-PopSize =5;
+Max_iteration = 15;
+PopSize =30;
 filename = 'result';
 functionsNumber = 4;
 ShowBestAnswer = 3;

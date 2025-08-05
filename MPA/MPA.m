@@ -153,9 +153,8 @@ disp(['MPA iterations is ' num2str(Iter)]);
          end
         lastfitness = AllFitness(i);
         %Calculate Fitness
-        AllFitness(i)= Fitness(Barnaclesoffspring(i,:),MachineNumber,LengthWorkshop,WidthWorkshop,M,L,W,Xio,Yio,Xoo,Yoo,Lo,Wo,Xo,Yo,LoC,WoC,XoC,YoC,f,C);    
-        fprintf('SMA Fitness %f  \n',AllFitness(i));
-      if fitness(i)<Top_predator_fit 
+        AllFitness(i)= Fitness(chromosomes(i,:),MachineNumber,LengthWorkshop,WidthWorkshop,M,L,W,Xio,Yio,Xoo,Yoo,Lo,Wo,Xo,Yo,LoC,WoC,XoC,YoC,f,C);    
+     if fitness(i)<Top_predator_fit 
        Top_predator_fit=fitness(i); 
        Top_predator_pos=Prey(i,:);
      end  
