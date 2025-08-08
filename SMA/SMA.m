@@ -164,14 +164,14 @@ ShowBestAnswer = 1;
 temp = [];
 tempval = [];
 
-for x = 1:ShowBestAnswer
-    if x <= length(val)  % برای جلوگیری از خطا اگر هیچ مقدار غیرصفری نباشه
-        temp(x, :) = XClean(idx(x), :);
-        tempval(x) = val(x);
-    end
-end
+% for x = 1:ShowBestAnswer
+%     if x <= length(val)  % برای جلوگیری از خطا اگر هیچ مقدار غیرصفری نباشه
+%         temp(x, :) = XClean(idx(x), :);
+%         tempval(x) = val(x);
+%     end
+% end
 
-
+temp = bestPositions;
 
 elapsed_time=toc;
 fprintf('SMA Finished %f Seconds. \n',elapsed_time);
